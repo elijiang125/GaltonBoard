@@ -33,12 +33,12 @@ def peg_gate(peg_wires: list) -> None:
     qml.CSWAP(wires=[q0, q2, q3])
 
 
-def build_galton_circuit(levels: int):
+def build_galton_circuit(levels: int, num_shots: int):
     """
-    Simulate a Galton Board of specified levels.
+    Simulate a Quantum Galton Board of specified levels.
     """
     num_wires = 2*levels
-    dev = qml.device("default.qubit", wires=num_wires)
+    dev = qml.device("default.qubit", wires=num_wires, shots=num_shots)
 
     @qml.qnode(dev)
     def circuit() -> np.ndarray:
