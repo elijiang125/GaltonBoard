@@ -28,6 +28,12 @@ def quantum_peg(peg_wires: list) -> None:
     qml.CNOT(wires=[q2, q0])
     qml.CSWAP(wires=[q0, q2, q3])
 
+def peg_pair(control: int, left: int, mid: int) -> None:
+    """
+    A single CSWAP-CNOT pair
+    """
+    qml.CSWAP(wires=[control, left, mid])
+    qml.CNOT(wires=[mid, control])
 
 def level_pegs(qubits: list) -> None:
     """
@@ -68,29 +74,79 @@ def build_galton_circuit(levels: int, num_shots: int):
         mid_idx = int(len(qubits)/2)
         q0 = qubits[0]  # Should always be 0, but for consistency let's keep it this way
         qb = qubits[mid_idx]  # Ball qubit
+        h_count = 0 # Elizabeth: must keep track of the # of Hadamard gates implemented
 
         # Initial state
         qml.Hadamard(wires=[q0])  # Induce superposition
+        h_count += 1 # Elizabeth: increment each H gate by 1
         qml.PauliX(wires=[qb])  # Start the ball in the middle
 
-        # Let the ball fall through
-        for lvl in range(2, levels + 1):  # +1 to keep the range inclusive
-            # Specify the qubits involved on the current level
-            side_wires = lvl - 1  # Number of wires needed to each side of the middle (ball) one
-            left_range = mid_idx - side_wires
-            right_range = mid_idx + side_wires + 1  # The +1 is there to make the slice inclusive on the right
-            level_qubits = [q0] + qubits[left_range:right_range]  
-            
-            # Account for all possibilities in the current level
-            level_pegs(level_qubits)
+        quantum_peg([0, levels - 1, levels, levels + 1]) #Elizabeth: CSWAP + CNOT + CSWAP
 
-            # Reset the control qubit to |0> and apply Hadamard if there is a next level
-            if lvl < levels:
+        #Elizabeth: So must track indices for middle-section
+        first_s = levels # control index for last CNOT of first section
+        second_s = first_s + 1 # first target index for first CSWAP of the second section
+
+        #--------------Okay so this is the middle section-------------
+
+        if levels > 3:
+            while h_count != levels - 2:
+                h_count += 1
                 reset_control_qubit()
-                qml.Hadamard(wires=[q0])
+                qml.Hadamard(wires=[0])
+                print(f"We are now at the {h_count}-th Hadamard!")
+            
+                # so this is that yellow part where we need exactly two CSWAP-CNOT pairs
+                peg_pair(0, first_s-2, first_s-1)
+                peg_pair(0, first_s-1, first_s)
+                print(f"Finished applying two pairs fo peg gates starting at wire {first_s}.") #debugging
 
+                # okay now the green/red zone part this is going to suck
+                firstCSWAP_index = second_s #cannot update this second_s, we need to use it to increement for above while loop
+
+                while firstCSWAP_index > first_s:
+                    qml.CSWAP(wires=[0, firstCSWAP_index, firstCSWAP_index + 1])
+                    print(f"CSWAP(0, {firstCSWAP_index}, {firstCSWAP_index + 1})") #debugging
+                    qml.CNOT(wires=[firstCSWAP_index, 0])
+                    print(f"CNOT({firstCSWAP_index}, 0)") #debugging
+                    firstCSWAP_index -= 1
+                    
+                #Final CSWAP
+                qml.CSWAP(wires=[0, first_s, first_s + 1])
+                
+                # now we do the increments and decrements for the next middle layer
+                first_s -= 1
+                second_s += 1
+        
+        print(f"\n Left while loop because Hadamard layer is at {h_count}")
+        # --------------Yay third section -------------------------------
+
+        if levels > 2:
+            reset_control_qubit()
+            qml.Hadamard(wires=[0])
+
+            for i in range(2 * (levels - 1) - 1):
+                peg_pair(0, i+1, i+2)
+            
+            # last CSWAP
+            qml.CSWAP(wires=[0, 2 * levels - 2, 2 * levels - 1])
 
         return qml.probs(wires=list(range(1, num_wires, 2)))
+        # Let the ball fall through
+        #for lvl in range(2, levels + 1):  # +1 to keep the range inclusive
+            # Specify the qubits involved on the current level
+            #side_wires = lvl - 1  # Number of wires needed to each side of the middle (ball) one
+            #left_range = mid_idx - side_wires
+            #right_range = mid_idx + side_wires + 1  # The +1 is there to make the slice inclusive on the right
+            #level_qubits = [q0] + qubits[left_range:right_range]  
+            
+            # Account for all possibilities in the current level
+            #level_pegs(level_qubits)
+
+            # Reset the control qubit to |0> and apply Hadamard if there is a next level
+            #if lvl < levels:
+                #reset_control_qubit()
+                #qml.Hadamard(wires=[q0])
 
     return circuit
 
