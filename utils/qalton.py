@@ -94,21 +94,18 @@ def build_galton_circuit(levels: int, num_shots: int):
                 h_count += 1
                 reset_control_qubit()
                 qml.Hadamard(wires=[0])
-                print(f"We are now at the {h_count}-th Hadamard!")
+                print(f"We are now at the {h_count + 1}-th Hadamard!")
             
                 # so this is that yellow part where we need exactly two CSWAP-CNOT pairs
                 peg_pair(0, first_s-2, first_s-1)
                 peg_pair(0, first_s-1, first_s)
-                print(f"Finished applying two pairs fo peg gates starting at wire {first_s}.") #debugging
 
                 # okay now the green/red zone part this is going to suck
                 firstCSWAP_index = second_s #cannot update this second_s, we need to use it to increement for above while loop
 
                 while firstCSWAP_index > first_s:
                     qml.CSWAP(wires=[0, firstCSWAP_index, firstCSWAP_index + 1])
-                    print(f"CSWAP(0, {firstCSWAP_index}, {firstCSWAP_index + 1})") #debugging
                     qml.CNOT(wires=[firstCSWAP_index, 0])
-                    print(f"CNOT({firstCSWAP_index}, 0)") #debugging
                     firstCSWAP_index -= 1
                     
                 #Final CSWAP
@@ -117,8 +114,6 @@ def build_galton_circuit(levels: int, num_shots: int):
                 # now we do the increments and decrements for the next middle layer
                 first_s -= 1
                 second_s += 1
-        
-        print(f"\n Left while loop because Hadamard layer is at {h_count}")
         # --------------Yay third section -------------------------------
 
         if levels > 2:
@@ -147,6 +142,81 @@ def build_galton_circuit(levels: int, num_shots: int):
             #if lvl < levels:
                 #reset_control_qubit()
                 #qml.Hadamard(wires=[q0])
+
+    return circuit
+
+
+def abstracted_galton_circuit(levels: int, num_shots: int, coin_gate,): #coin_gate is our gate (either H or Rx), so it'll be a function
+    """
+    Simulate a Standard OR Biased N-Level Quantum Board
+    if coin_gate is H -> standard
+    if coin_gate is Rx -> biased
+    """
+    num_wires = 2*levels
+    # biased: here we must initialize our p & our theta values
+
+    dev = qml.device("default.qubit", wires=num_wires, shots=num_shots)
+
+    qubits = list(range(num_wires))  # Local variable used in the inner function
+
+    @qml.qnode(dev)
+    def circuit() -> np.ndarray:
+        # Control and input qubits
+        mid_idx = int(len(qubits)/2)
+        q0 = qubits[0] 
+        qb = qubits[mid_idx]  
+        gate_count = 0 # counting # of coin gates
+
+        # First Section
+        coin_gate()
+        gate_count += 1 
+        qml.PauliX(wires=[qb])
+
+        quantum_peg([0, levels - 1, levels, levels + 1])
+
+        first_s = levels 
+        second_s = first_s + 1 
+
+        #--------------Middle Section-------------
+
+        if levels > 3:
+            while gate_count != levels - 2:
+                gate_count += 1
+                reset_control_qubit()
+                coin_gate()
+                print(f"We are now at the {gate_count + 1}-th Hadamard!")
+            
+                # Two CSWAP-CNOT pairs
+                peg_pair(0, first_s-2, first_s-1)
+                peg_pair(0, first_s-1, first_s)
+
+                # Keep track of index for loop
+                firstCSWAP_index = second_s 
+
+                while firstCSWAP_index > first_s:
+                    qml.CSWAP(wires=[0, firstCSWAP_index, firstCSWAP_index + 1])
+                    qml.CNOT(wires=[firstCSWAP_index, 0])
+                    firstCSWAP_index -= 1
+                    
+                #Final CSWAP
+                qml.CSWAP(wires=[0, first_s, first_s + 1])
+                
+                # Increments and decrements for the next middle layer
+                first_s -= 1
+                second_s += 1
+        # --------------Third Section -------------------------------
+
+        if levels > 2:
+            reset_control_qubit()
+            coin_gate()
+
+            for i in range(2 * (levels - 1) - 1):
+                peg_pair(0, i+1, i+2)
+            
+            # last CSWAP
+            qml.CSWAP(wires=[0, 2 * levels - 2, 2 * levels - 1])
+
+        return qml.probs(wires=list(range(1, num_wires, 2)))
 
     return circuit
 
