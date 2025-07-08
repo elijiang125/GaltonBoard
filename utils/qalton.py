@@ -1,5 +1,6 @@
 import pennylane as qml
 from pennylane import numpy as np
+from math import asin, sqrt
 
 
 def reset_control_qubit() -> None:
@@ -53,10 +54,13 @@ def level_pegs(qubits: list) -> None:
             qml.CNOT(wires=[q3, q0])
 
 
-def build_galton_circuit(levels: int, num_shots: int):
+def build_galton_circuit(levels: int, num_shots: int, bias: float = 0.5):
     """
     Simulate a Quantum Galton Board of specified levels.
     """
+    # Compute phi
+    phi = 2*asin(sqrt(bias))
+
     num_wires = 2*levels
     dev = qml.device("default.qubit", wires=num_wires, shots=num_shots)
 
@@ -70,7 +74,7 @@ def build_galton_circuit(levels: int, num_shots: int):
         qb = qubits[mid_idx]  # Ball qubit
 
         # Initial state
-        qml.Hadamard(wires=[q0])  # Induce superposition
+        qml.RX(phi, wires=[q0])  # Induce superposition
         qml.PauliX(wires=[qb])  # Start the ball in the middle
 
         # Let the ball fall through
@@ -84,10 +88,10 @@ def build_galton_circuit(levels: int, num_shots: int):
             # Account for all possibilities in the current level
             level_pegs(level_qubits)
 
-            # Reset the control qubit to |0> and apply Hadamard if there is a next level
+            # Reset the control qubit to |0> and apply Rx if there is a next level
             if lvl < levels:
                 reset_control_qubit()
-                qml.Hadamard(wires=[q0])
+                qml.RX(phi, wires=[q0])
 
 
         return qml.probs(wires=list(range(1, num_wires, 2)))
