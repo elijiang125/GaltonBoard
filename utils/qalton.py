@@ -3,10 +3,13 @@ from pennylane import numpy as np
 from math import asin, sqrt
 
 
-def reset_control_qubit() -> None:
+def reset_control_qubit(enable: bool = True) -> None:
     """
     Resets q0 to |0>.
+    Note: for hadamard quantum walk, cannot reset q0
     """
+    if not enable:
+        return
     # Mid-circuit measure
     m = qml.measure(0)
     qml.cond(m, qml.PauliX)(0)
@@ -53,8 +56,7 @@ def level_pegs(qubits: list) -> None:
         if tri_idx + 1 < len(qubits_triplets):  # +1 is there because indices start at 0
             qml.CNOT(wires=[q3, q0])
 
-
-def build_galton_circuit(levels: int, num_shots: int, bias: float = 0.5):
+def build_galton_circuit(levels: int, num_shots: int, bias: float = 0.5, coherence: bool = False):
     """
     Simulate a Quantum Galton Board of specified levels.
     """
@@ -90,7 +92,7 @@ def build_galton_circuit(levels: int, num_shots: int, bias: float = 0.5):
 
             # Reset the control qubit to |0> and apply Rx if there is a next level
             if lvl < levels:
-                reset_control_qubit()
+                reset_control_qubit(enable = not coherence)
                 qml.RX(phi, wires=[q0])
 
 
