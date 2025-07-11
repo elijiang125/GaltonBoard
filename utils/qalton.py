@@ -3,12 +3,6 @@ from pennylane import numpy as np
 from math import asin, sqrt
 
 
-<<<<<<< HEAD
-def reset_control_qubit(enable: bool = True) -> None:
-    """
-    Resets q0 to |0>.
-    Note: for hadamard quantum walk, cannot reset q0
-=======
 def triangular_number(n):
     """
     Computes the triangular number T_n
@@ -19,7 +13,6 @@ def triangular_number(n):
 def reset_qubit(idx) -> None:
     """
     Resets q_idx to |0>.
->>>>>>> 9354626 (Finished the fine-grained QGB)
     """
     if not enable:
         return
@@ -70,13 +63,8 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
             reset_qubit(0)  # Reset control qubit
             qml.RX(phi_vals[tri_idx], wires=[q0])
 
-<<<<<<< HEAD
-def build_galton_circuit(levels: int, num_shots: int, bias: float = 0.5, coherence: bool = False):
-=======
-
 
 def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list = 0.5):
->>>>>>> 9354626 (Finished the fine-grained QGB)
     """
     Simulate a Quantum Galton Board of specified levels.
     """
@@ -148,14 +136,8 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
             
             # Reset the control qubit to |0> and apply Rx if there is a next level
             if lvl < levels:
-<<<<<<< HEAD
-                reset_control_qubit(enable = not coherence)
-                qml.RX(phi, wires=[q0])
-=======
                 reset_qubit(0)  # Reset control qubit
                 qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
->>>>>>> 9354626 (Finished the fine-grained QGB)
-
 
         return qml.probs(wires=list(range(1, num_wires, 2)))
 
