@@ -1,14 +1,26 @@
 import pennylane as qml
 from pennylane import numpy as np
+from math import asin, sqrt
 
 
-def reset_control_qubit() -> None:
+def triangular_number(n):
     """
-    Resets q0 to |0>.
+    Computes the triangular number T_n
     """
+    return int(n*(n + 1)/2)
+
+
+def reset_qubit(idx: int, enable:bool = True) -> None:
+    """
+    Resets q_idx to |0>.
+    Note: for hadamard quantum walk, cannot reset q0
+    """
+    if not enable:
+        return
+
     # Mid-circuit measure
-    m = qml.measure(0)
-    qml.cond(m, qml.PauliX)(0)
+    m = qml.measure(idx)
+    qml.cond(m, qml.PauliX)(idx)
 
 
 def quantum_peg(peg_wires: list) -> None:
@@ -28,14 +40,8 @@ def quantum_peg(peg_wires: list) -> None:
     qml.CNOT(wires=[q2, q0])
     qml.CSWAP(wires=[q0, q2, q3])
 
-def peg_pair(control: int, left: int, mid: int) -> None:
-    """
-    A single CSWAP-CNOT pair
-    """
-    qml.CSWAP(wires=[control, left, mid])
-    qml.CNOT(wires=[mid, control])
 
-def level_pegs(qubits: list) -> None:
+def level_pegs(qubits: list, phi_vals: list) -> None:
     """
     Applies all the quantum peg modules for a single level.
     Does this by taking triplets starting from the leftmost and moving to the right.
@@ -54,19 +60,33 @@ def level_pegs(qubits: list) -> None:
         # Apply the operators of a Quantum Peg
         quantum_peg(peg_wires=[q0, q1, q2, q3])
 
-        # Return control qubit probability to 50% after every triplet exept the last one
+        # Return control qubit to original rotation
         if tri_idx + 1 < len(qubits_triplets):  # +1 is there because indices start at 0
-            qml.CNOT(wires=[q3, q0])
+            reset_qubit(0)  # Reset control qubit
+            qml.RX(phi_vals[tri_idx], wires=[q0])
 
 
-def build_galton_circuit(levels: int, num_shots: int):
+def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list = 0.5, coherence: bool = False):
     """
     Simulate a Quantum Galton Board of specified levels.
     """
+    num_pegs = triangular_number(levels - 1)
     num_wires = 2*levels
     dev = qml.device("default.qubit", wires=num_wires, shots=num_shots)
-
+    
     qubits = list(range(num_wires))  # Local variable used in the inner function
+    
+    # Force the bias to a list to make it easier to work with single and multiple biases
+    if isinstance(bias, float) or isinstance(bias, int):
+        biases = [bias for i in range(num_pegs)]
+
+    # Make sure that if multiple biases are provided, it matches the number needed for the levels specified
+    elif len(bias) == num_pegs:
+        print(f"{len(bias)} provided for {num_pegs} pegs")
+        return
+
+    # Compute angle(s) for the Rx gate
+    phi_vals = [2*asin(sqrt(p)) for p in biases]
 
     @qml.qnode(dev)
     def circuit() -> np.ndarray:
@@ -74,147 +94,52 @@ def build_galton_circuit(levels: int, num_shots: int):
         mid_idx = int(len(qubits)/2)
         q0 = qubits[0]  # Should always be 0, but for consistency let's keep it this way
         qb = qubits[mid_idx]  # Ball qubit
-        h_count = 0 # Elizabeth: must keep track of the # of Hadamard gates implemented
 
         # Initial state
-        qml.Hadamard(wires=[q0])  # Induce superposition
-        h_count += 1 # Elizabeth: increment each H gate by 1
+        qml.RX(phi_vals[0], wires=[q0])  # Induce superposition
         qml.PauliX(wires=[qb])  # Start the ball in the middle
 
-        quantum_peg([0, levels - 1, levels, levels + 1]) #Elizabeth: CSWAP + CNOT + CSWAP
-
-        #Elizabeth: So must track indices for middle-section
-        first_s = levels # control index for last CNOT of first section
-        second_s = first_s + 1 # first target index for first CSWAP of the second section
-
-        #--------------Okay so this is the middle section-------------
-
-        if levels > 3:
-            while h_count != levels - 2:
-                h_count += 1
-                reset_control_qubit()
-                qml.Hadamard(wires=[0])
-                print(f"We are now at the {h_count + 1}-th Hadamard!")
-            
-                # so this is that yellow part where we need exactly two CSWAP-CNOT pairs
-                peg_pair(0, first_s-2, first_s-1)
-                peg_pair(0, first_s-1, first_s)
-
-                # okay now the green/red zone part this is going to suck
-                firstCSWAP_index = second_s #cannot update this second_s, we need to use it to increement for above while loop
-
-                while firstCSWAP_index > first_s:
-                    qml.CSWAP(wires=[0, firstCSWAP_index, firstCSWAP_index + 1])
-                    qml.CNOT(wires=[firstCSWAP_index, 0])
-                    firstCSWAP_index -= 1
-                    
-                #Final CSWAP
-                qml.CSWAP(wires=[0, first_s, first_s + 1])
-                
-                # now we do the increments and decrements for the next middle layer
-                first_s -= 1
-                second_s += 1
-        # --------------Yay third section -------------------------------
-
-        if levels > 2:
-            reset_control_qubit()
-            qml.Hadamard(wires=[0])
-
-            for i in range(2 * (levels - 1) - 1):
-                peg_pair(0, i+1, i+2)
-            
-            # last CSWAP
-            qml.CSWAP(wires=[0, 2 * levels - 2, 2 * levels - 1])
-
-        return qml.probs(wires=list(range(1, num_wires, 2)))
         # Let the ball fall through
-        #for lvl in range(2, levels + 1):  # +1 to keep the range inclusive
+        for lvl in range(2, levels + 1):  # +1 to keep the range inclusive
             # Specify the qubits involved on the current level
-            #side_wires = lvl - 1  # Number of wires needed to each side of the middle (ball) one
-            #left_range = mid_idx - side_wires
-            #right_range = mid_idx + side_wires + 1  # The +1 is there to make the slice inclusive on the right
-            #level_qubits = [q0] + qubits[left_range:right_range]  
+            side_wires = lvl - 1  # Number of wires needed to each side of the middle (ball) one
+            left_range = mid_idx - side_wires
+            right_range = mid_idx + side_wires + 1  # The +1 is there to make the slice inclusive on the right
+            level_qubits = [q0] + qubits[left_range:right_range]  
             
             # Account for all possibilities in the current level
-            #level_pegs(level_qubits)
+            Rx_needed = lvl - 2  # Number of Rx gates needed within the current level (# of spaces between pegs)
+            Rx_used = triangular_number(Rx_needed) + 1  # Number of Rx gates used so far
+            level_phi_vals = phi_vals[Rx_used:Rx_used + Rx_needed]
+            level_pegs(level_qubits, level_phi_vals)
 
-            # Reset the control qubit to |0> and apply Hadamard if there is a next level
-            #if lvl < levels:
-                #reset_control_qubit()
-                #qml.Hadamard(wires=[q0])
+            # Add leftover rotation for the final triplet and reset
+            if lvl >= 3:
+                # Draw a barrier for visualization
+                qml.Barrier()
 
-    return circuit
+                # Start and end positions for range that gets us the triplets at the end that we need
+                # For lvl = 3, we need 1 triplet at the end of the qubits list (left to right of the circuit)
+                # For lvl = 4, we need 2 triplets at the end of the list, and so on...
+                start_pos = len(level_qubits) - 2*lvl + 3  # len(level_qubits) - 1 - 2(lvl - 2)
+                end_pos = len(level_qubits) - 2
 
+                # Get the last lvl-2 level qubits' triplets
+                for idx in range(start_pos, end_pos, 2):
+                    # Slice the triplet
+                    triplet = level_qubits[idx:idx + 3]
 
-def abstracted_galton_circuit(levels: int, num_shots: int, coin_gate,): #coin_gate is our gate (either H or Rx), so it'll be a function
-    """
-    Simulate a Standard OR Biased N-Level Quantum Board
-    if coin_gate is H -> standard
-    if coin_gate is Rx -> biased
-    """
-    num_wires = 2*levels
-    # biased: here we must initialize our p & our theta values
+                    # Take the left(upper) and middle qubits on each selected triplet to apply CNOTs
+                    q1 = triplet[0]  # Left
+                    q2 = triplet[1]  # Middle
 
-    dev = qml.device("default.qubit", wires=num_wires, shots=num_shots)
-
-    qubits = list(range(num_wires))  # Local variable used in the inner function
-
-    @qml.qnode(dev)
-    def circuit() -> np.ndarray:
-        # Control and input qubits
-        mid_idx = int(len(qubits)/2)
-        q0 = qubits[0] 
-        qb = qubits[mid_idx]  
-        gate_count = 0 # counting # of coin gates
-
-        # First Section
-        coin_gate()
-        gate_count += 1 
-        qml.PauliX(wires=[qb])
-
-        quantum_peg([0, levels - 1, levels, levels + 1])
-
-        first_s = levels 
-        second_s = first_s + 1 
-
-        #--------------Middle Section-------------
-
-        if levels > 3:
-            while gate_count != levels - 2:
-                gate_count += 1
-                reset_control_qubit()
-                coin_gate()
-                print(f"We are now at the {gate_count + 1}-th Hadamard!")
+                    qml.CNOT(wires=[q2, q1])
+                    reset_qubit(q2)
             
-                # Two CSWAP-CNOT pairs
-                peg_pair(0, first_s-2, first_s-1)
-                peg_pair(0, first_s-1, first_s)
-
-                # Keep track of index for loop
-                firstCSWAP_index = second_s 
-
-                while firstCSWAP_index > first_s:
-                    qml.CSWAP(wires=[0, firstCSWAP_index, firstCSWAP_index + 1])
-                    qml.CNOT(wires=[firstCSWAP_index, 0])
-                    firstCSWAP_index -= 1
-                    
-                #Final CSWAP
-                qml.CSWAP(wires=[0, first_s, first_s + 1])
-                
-                # Increments and decrements for the next middle layer
-                first_s -= 1
-                second_s += 1
-        # --------------Third Section -------------------------------
-
-        if levels > 2:
-            reset_control_qubit()
-            coin_gate()
-
-            for i in range(2 * (levels - 1) - 1):
-                peg_pair(0, i+1, i+2)
-            
-            # last CSWAP
-            qml.CSWAP(wires=[0, 2 * levels - 2, 2 * levels - 1])
+            # Reset the control qubit to |0> and apply Rx if there is a next level
+            if lvl < levels:
+                reset_qubit(0, enable = not coherence)  # Reset control qubit
+                qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
 
         return qml.probs(wires=list(range(1, num_wires, 2)))
 
