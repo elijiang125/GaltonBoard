@@ -10,12 +10,14 @@ def triangular_number(n):
     return int(n*(n + 1)/2)
 
 
-def reset_qubit(idx) -> None:
+def reset_qubit(idx: int, enable:bool = True) -> None:
     """
     Resets q_idx to |0>.
+    Note: for hadamard quantum walk, cannot reset q0
     """
     if not enable:
         return
+
     # Mid-circuit measure
     m = qml.measure(idx)
     qml.cond(m, qml.PauliX)(idx)
@@ -64,7 +66,7 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
             qml.RX(phi_vals[tri_idx], wires=[q0])
 
 
-def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list = 0.5):
+def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list = 0.5, coherence: bool = False):
     """
     Simulate a Quantum Galton Board of specified levels.
     """
@@ -136,7 +138,7 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
             
             # Reset the control qubit to |0> and apply Rx if there is a next level
             if lvl < levels:
-                reset_qubit(0)  # Reset control qubit
+                reset_qubit(0, enable = not coherence)  # Reset control qubit
                 qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
 
         return qml.probs(wires=list(range(1, num_wires, 2)))
