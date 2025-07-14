@@ -81,7 +81,7 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
         biases = [bias for i in range(num_pegs)]
 
     # Make sure that if multiple biases are provided, it matches the number needed for the levels specified
-    elif len(bias) == num_pegs:
+    elif len(bias) != num_pegs:
         print(f"{len(bias)} provided for {num_pegs} pegs")
         return
 
