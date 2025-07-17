@@ -8,9 +8,9 @@ def reset_gate(idx: int, enable:bool = True) -> None:
     if not enable:
         return
 
-    # Mid-circuit measure
-    m = qml.measure(idx)
-    qml.cond(m, qml.PauliX)(idx)
+    # Mid-circuit reset
+    m = qml.measure(idx, reset=True)
+    # qml.cond(m, qml.PauliX)(idx)
 
 
 def quantum_peg(peg_wires: list) -> None:

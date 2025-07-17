@@ -1,14 +1,9 @@
 import pennylane as qml
 from pennylane import numpy as np
 from math import asin, sqrt
-from gates import reset_gate, quantum_peg
 
-
-def triangular_number(n):
-    """
-    Computes the triangular number T_n
-    """
-    return int(n*(n + 1)/2)
+from .gates import reset_gate, quantum_peg
+from utils.misc import triangular_number, angle_from_prob
 
 
 def level_pegs(qubits: list, phi_vals: list) -> None:
@@ -36,13 +31,16 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
             qml.RX(phi_vals[tri_idx], wires=[q0])
 
 
-def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list = 0.5, coherence: bool = False):
+def build_galton_circuit(levels: int, 
+                         num_shots: int, 
+                         bias: int | float | list = 0.5, 
+                         return_probs: bool = True):
     """
-    Simulate a Quantum Galton Board of specified levels.
+    Creates the quantum circuit for a Fine-Grained Biased Quantum Galton Board.
     """
     num_pegs = triangular_number(levels - 1)
     num_wires = 2*levels
-    dev = qml.device("default.qubit", wires=num_wires, shots=num_shots)
+    dev = qml.device("lightning.qubit", wires=num_wires, shots=num_shots)
     
     qubits = list(range(num_wires))  # Local variable used in the inner function
     
@@ -51,12 +49,15 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
         biases = [bias for i in range(num_pegs)]
 
     # Make sure that if multiple biases are provided, it matches the number needed for the levels specified
-    elif len(bias) == num_pegs:
+    elif len(bias) != num_pegs:
         print(f"{len(bias)} provided for {num_pegs} pegs")
         return
 
+    else:
+        biases = bias
+
     # Compute angle(s) for the Rx gate
-    phi_vals = [2*asin(sqrt(p)) for p in biases]
+    phi_vals = [angle_from_prob(p) for p in biases]
 
     @qml.qnode(dev)
     def circuit() -> np.ndarray:
@@ -108,10 +109,16 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
             
             # Reset the control qubit to |0> and apply Rx if there is a next level
             if lvl < levels:
-                reset_gate(0, enable = not coherence)  # Reset control qubit
+                reset_gate(0)  # Reset control qubit
                 qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
+       
+        # Return observed values
+        measured_wires = list(range(1, num_wires, 2))
+        if return_probs:
+            return qml.probs(wires=measured_wires)
 
-        return qml.probs(wires=list(range(1, num_wires, 2)))
+        else:
+            return qml.counts(wires=measured_wires)
 
     return circuit
 
