@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import pandas as pd
 import joblib as jlb
 from tqdm import tqdm
 from pathlib import Path
@@ -9,7 +10,7 @@ from circuit import quantum_galton_board as qgb
 from utils.misc import triangular_number
 
 
-def sim_run(levels: int, num_shots: int, Rx_n: int) -> np.ndarray:
+def sim_run(levels: int, num_shots: int, Rx_n: int) -> dict[str, int | float]:
     """
 
     """
@@ -20,12 +21,10 @@ def sim_run(levels: int, num_shots: int, Rx_n: int) -> np.ndarray:
     qc = qgb.build_galton_circuit(levels=levels, num_shots=num_shots, bias=p_vals, return_probs=False)
     obs_counts = qc()
 
-    # Create the corresponding row of the final NumPy array
-    obs_row = np.zeros((1, Rx_n + 2**levels))  # Row vector
-    idxs = list(range(Rx_n)) + [int(idx_bin, 2) for idx_bin in obs_counts.keys()]  # Fill only the entries we got
-    obs_row[0, idxs] = np.append(p_vals, list(obs_counts.values()))
+    # Add the probabilities used
+    probs = {f"prob{idx+1}": pval for idx, pval in enumerate(p_vals)}
 
-    return obs_row
+    return {**probs, **obs_counts}
 
 
 def simulate_qgb(levels: int, num_shots: int, sims_n: int, results_path: Path) -> None:
@@ -38,24 +37,25 @@ def simulate_qgb(levels: int, num_shots: int, sims_n: int, results_path: Path) -
         sims_n - Number of times to simulate the QGB.
         results_path - Path to directory to store the CSV file with the results.
 
-    Saves a NumPy array of shape (sims_n, Rx_n + 2**levels) where
-        - Rx_n is the number of Rx gates used by the circuit.
-        - levels is also the number of qubits measured at the end of the circuit.
+    Saves a Pandas DataFrame with columns:
+        - p-values, one for each Rx gate (prob1, ..., probn)
+        - states of the outcomes (e.g. '100', '010', '001')
 
-    The file is a NumPy non-compressed npz file.
+    The file is a CSV file.
     """
     Rx_n = triangular_number(levels - 1)  # Number of Rx gates used
     
     # Run the QGB circuit sims_n times
     num_cpus = round(jlb.cpu_count()/2)
-    arr_list = jlb.Parallel(n_jobs=num_cpus)(jlb.delayed(sim_run)(levels, num_shots, Rx_n) for sim in tqdm(range(sims_n)))
-    
-    # Stack all rows of observed counts
-    obs_arr = np.vstack(arr_list)
+    obs_list = jlb.Parallel(n_jobs=num_cpus)(jlb.delayed(sim_run)(levels, num_shots, Rx_n) for sim in tqdm(range(sims_n)))
+
+    # Create a DataFrame of the observations
+    obs_df = pd.DataFrame(obs_list).fillna(0)
 
     # Save the results from all simulations
-    filename = results_path.joinpath(f"obs_counts_levels{levels}_shots{num_shots}_sims{sims_n}.npz")
-    np.savez(filename, obs_arr)
+    filepath = results_path.joinpath(f"obs_counts_levels{levels}_shots{num_shots}_sims{sims_n}.csv")
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    obs_df.to_csv(filepath, index=False)
 
 
 def process_simulations():
