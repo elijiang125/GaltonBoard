@@ -72,7 +72,7 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
     """
     num_pegs = triangular_number(levels - 1)
     num_wires = 2*levels
-    dev = qml.device("default.qubit", wires=num_wires, shots=num_shots)
+    dev = qml.device("lightning.qubit", wires=num_wires, shots=num_shots)
     
     qubits = list(range(num_wires))  # Local variable used in the inner function
     
