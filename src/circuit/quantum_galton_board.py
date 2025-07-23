@@ -33,8 +33,7 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
 
 def build_galton_circuit(levels: int, 
                          num_shots: int, 
-                         bias: int | float | list = 0.5, 
-                         return_probs: bool = True):
+                         bias: int | float | list = 0.5):
     """
     Creates the quantum circuit for a Fine-Grained Biased Quantum Galton Board.
     """
@@ -113,12 +112,7 @@ def build_galton_circuit(levels: int,
                 qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
        
         # Return observed values
-        measured_wires = list(range(1, num_wires, 2))
-        if return_probs:
-            return qml.probs(wires=measured_wires)
-
-        else:
-            return qml.counts(wires=measured_wires)
+        return qml.probs(wires=list(range(1, num_wires, 2)))
 
     return circuit
 
