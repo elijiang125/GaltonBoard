@@ -1,0 +1,24 @@
+[project]
+name = "GaltonBoard"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "ipython>=9.4.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.3",
+    "numpy>=2.3.2",
+    "pandas>=2.3.1",
+    "pennylane==0.41.1",
+    "pennylane-qiskit>=0.41.0.post0",
+    "pip>=25.1.1",
+    "scikit-learn>=1.7.1",
+    "scipy>=1.16.1",
+    "seaborn>=0.13.2",
+    "torch>=2.4.1",
+    "tqdm>=4.67.1",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
