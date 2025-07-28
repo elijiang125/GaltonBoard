@@ -41,7 +41,8 @@ def quantum_peg(peg_wires: list) -> None:
     qml.CSWAP(wires=[q0, q2, q3])
 
 
-def level_pegs(qubits: list, phi_vals: list) -> None:
+def level_pegs(qubits: list, phi_vals: list, coherence: bool) -> None:
+    # 07/28 Update: Added coherence as a param
     """
     Applies all the quantum peg modules for a single level.
     Does this by taking triplets starting from the leftmost and moving to the right.
@@ -62,18 +63,40 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
 
         # Return control qubit to original rotation
         if tri_idx + 1 < len(qubits_triplets):  # +1 is there because indices start at 0
-            reset_qubit(0)  # Reset control qubit
-            qml.RX(phi_vals[tri_idx], wires=[q0])
+            reset_qubit(0, enable=not coherence)  # Reset control qubit
+            # 07/28 Update: enabled coherence
+            if tri_idx < len(phi_vals): # if less than length of phi_vals -> RX
+                qml.RX(phi_vals[tri_idx], wires=[q0])
 
 
-def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list = 0.5, coherence: bool = False):
+def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list = 0.5, coherence: bool = False, qiskit_noise_model=None, PL_noise = None, return_counts: bool=False):
     """
     Simulate a Quantum Galton Board of specified levels.
     """
+    # 07/28 Update: Added qiskit_noise_model, PL_noise, and return_counts
+    # Qiskit_noise_model & PL_noise  (PennyLane) are noise models. Not sure which one to use, so might as well experiment both
+    # return_counts: use qml.counts for circuits w/ > 24 wires, qml.probs for anything else
+
     num_pegs = triangular_number(levels - 1)
     num_wires = 2*levels
-    dev = qml.device("lightning.qubit", wires=num_wires, shots=num_shots)
-    
+
+    # 07/28 Update: Here, we must pick a device (ideal vs noisy)
+    if qiskit_noise_model is not None:
+        # Plan A: run on Qiskit Aer with its NoiseModel
+        dev = qml.device(
+            "qiskit.aer",
+            wires=num_wires,
+            shots=num_shots,
+            noise_model=qiskit_noise_model,
+        )
+    else:
+        # Path B: ideal OR default.mixed (noise added via transform)
+        dev = qml.device(
+            "default.mixed" if PL_noise is not None else "lightning.qubit",
+            # Use PennyLane's if PL_noise has something, if not then use standard
+            wires=num_wires,
+            shots=num_shots,
+        )
     qubits = list(range(num_wires))  # Local variable used in the inner function
     
     # Force the bias to a list to make it easier to work with single and multiple biases
@@ -111,7 +134,7 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
             Rx_needed = lvl - 2  # Number of Rx gates needed within the current level (# of spaces between pegs)
             Rx_used = triangular_number(Rx_needed) + 1  # Number of Rx gates used so far
             level_phi_vals = phi_vals[Rx_used:Rx_used + Rx_needed]
-            level_pegs(level_qubits, level_phi_vals)
+            level_pegs(level_qubits, level_phi_vals, coherence) # 07/28 Update: Added coherence param
 
             # Add leftover rotation for the final triplet and reset
             if lvl >= 3:
@@ -141,7 +164,20 @@ def build_galton_circuit(levels: int, num_shots: int, bias: int | float | list =
                 reset_qubit(0, enable = not coherence)  # Reset control qubit
                 qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
 
-        return qml.probs(wires=list(range(1, num_wires, 2)))
+        # 07/28 Update: IF we're doing noisy model, then we must do qml.counts to deepen n-levels
+        # Note: qml.probs cannot do > 24 wires
 
-    return circuit
+        odd_wires = list(range(1, num_wires, 2))
+        if return_counts:
+            return qml.counts(wires=odd_wires)
+        else:
+            return qml.probs(wires=odd_wires)
+        
+    # 07/28 Update: so the PL noise model needs to be wrapped up as a QNode
+    qnode = qml.Qnode(circuit, dev)
+    if PL_noise is not None:
+        qnode=qml.transforms.add_noise(qnode,PL_noise)
+
+        
+    return qnode
 
