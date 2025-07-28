@@ -60,10 +60,3 @@ def simulate_qgb(levels: int, num_shots: int, sims_n: int, results_path: Path) -
     filepath = results_path.joinpath(f"obs_probs_levels{levels}_shots{num_shots}_sims{sims_n}.npz")
     filepath.parent.mkdir(parents=True, exist_ok=True)
     sparse.save_npz(file=filepath, matrix=sparse_csr, compressed=True)
-
-
-def process_simulations():
-    """
-    
-    """
-    pass
