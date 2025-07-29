@@ -2,8 +2,12 @@ import pennylane as qml
 from pennylane import numpy as np
 from math import asin, sqrt
 
+from qiskit_aer import AerSimulator
+from qiskit_aer.noise import NoiseModel
+from qiskit.providers.fake_provider import GenericBackendV2
+
 from .gates import reset_gate, quantum_peg
-from utils.misc import triangular_number, angle_from_prob
+from utils.misc import triangular_number, angle_from_prob, count_mcm
 
 
 def level_pegs(qubits: list, phi_vals: list) -> None:
@@ -33,13 +37,29 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
 
 def build_galton_circuit(levels: int, 
                          num_shots: int, 
-                         bias: int | float | list = 0.5):
+                         bias: int | float | list = 0.5,
+                         add_noise: bool = False):
     """
     Creates the quantum circuit for a Fine-Grained Biased Quantum Galton Board.
     """
     num_pegs = triangular_number(levels - 1)
     num_wires = 2*levels
-    dev = qml.device("lightning.qubit", wires=num_wires, shots=num_shots)
+
+    # Choose device depending on the noise
+    if add_noise:
+        # Import noise model from Qiskit's backend
+        backend = GenericBackendV2(num_qubits=num_wires)
+        qk_noise_model = NoiseModel.from_backend(backend)
+
+        num_mcm = count_mcm(levels)
+        dev = qml.device("qiskit.aer", 
+                         wires=num_wires + num_mcm, 
+                         shots=num_shots, 
+                         noise_model=qk_noise_model)
+
+    else:
+        # Noiseless device
+        dev = qml.device("lightning.qubit", wires=num_wires, shots=num_shots)
     
     qubits = list(range(num_wires))  # Local variable used in the inner function
     
