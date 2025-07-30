@@ -33,10 +33,14 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
 
 def build_galton_circuit(levels: int, 
                          num_shots: int, 
-                         bias: int | float | list = 0.5):
+                         bias: int | float | list = 0.5,
+                         coherence=False):
     """
     Creates the quantum circuit for a Fine-Grained Biased Quantum Galton Board.
     """
+
+    if num_shots == 0:
+        num_shots = None            # treat 0 as analytic
     num_pegs = triangular_number(levels - 1)
     num_wires = 2*levels
     dev = qml.device("lightning.qubit", wires=num_wires, shots=num_shots)
@@ -84,7 +88,7 @@ def build_galton_circuit(levels: int,
             level_pegs(level_qubits, level_phi_vals)
 
             # Add leftover rotation for the final triplet and reset
-            if lvl >= 3:
+            if lvl >= 3 and not coherence:
                 # Draw a barrier for visualization
                 qml.Barrier()
 
@@ -107,7 +111,7 @@ def build_galton_circuit(levels: int,
                     reset_gate(q2)
             
             # Reset the control qubit to |0> and apply Rx if there is a next level
-            if lvl < levels:
+            if lvl < levels and not coherence:
                 reset_gate(0)  # Reset control qubit
                 qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
        
