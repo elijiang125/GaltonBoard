@@ -120,3 +120,31 @@ def build_galton_circuit(levels: int,
 
     return circuit
 
+# to fix this stupid wireerror that has 36 indexes
+def galton_template(levels: int, bias, *, coherence=False):
+    """Return a callable that queues the Galton-board operations
+       on whatever QNode/device is currently recording."""
+    num_pegs = triangular_number(levels - 1)
+    probs = bias if isinstance(bias, (list, tuple)) else [bias] * num_pegs
+    phis  = [angle_from_prob(p) for p in probs]
+
+    def template():
+        q0  = 0
+        mid = levels           # wire where the ball starts
+        qml.RX(phis[0], wires=q0)
+        qml.PauliX(wires=mid)
+
+        phi_ptr = 1
+        for lvl in range(2, levels + 1):
+            side = lvl - 1
+            level_ws = [q0] + list(range(mid - side, mid + side + 1))
+            need = lvl - 2
+            level_pegs(level_ws, phis[phi_ptr : phi_ptr + need], coherence)
+            phi_ptr += need
+
+            if lvl < levels and not coherence:
+                reset_gate(q0)
+                qml.RX(phis[phi_ptr], wires=q0)
+                phi_ptr += 1
+
+    return template
