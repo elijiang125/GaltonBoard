@@ -1,6 +1,7 @@
 import torch
+from torch import nn
 
-class FeedForwardNN(torch.nn.Module):
+class FeedForwardNN(nn.Module):
     """
     Simple Feed-Forward Neural Network
     """
@@ -9,14 +10,15 @@ class FeedForwardNN(torch.nn.Module):
         super(FeedForwardNN, self).__init__()
 
         # Define layers
-        self.fc1 = torch.nn.Linear(input_size, hidden_size) # Linear function - fully connected
-        self.relu = torch.nn.ReLU()  # Non-linearity
-        self.fc2 = torch.nn.Linear(hidden_size, output_size)  # Linear function (readout) - fully connected
+        self.layer_stack = nn.Sequential(
+                nn.Linear(input_size, hidden_size),  # Linear function - fully connected
+                nn.ReLU(),  # Non-linearity
+                nn.Linear(hidden_size, output_size),  # Linear function (readout) - fully connected
+                nn.Sigmoid()  # Force the outputs between [0,1)
+            )
 
     def forward(self, x):
         # Define forward pass
-        out = self.fc1(x)  # Pass input through first layer
-        out = self.relu(out)  # Apply ReLU activation
-        out = self.fc2(out)  # Pass through second layer to get output
+        out = layer_stack(x)
 
         return out

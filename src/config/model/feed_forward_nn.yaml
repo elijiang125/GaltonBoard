@@ -1,0 +1,4 @@
+_target_: models.neural_nets.FeedForwardNN
+name: FeedForwardNN
+hidden_size: False # Change to a number
+hidden_layers: 1

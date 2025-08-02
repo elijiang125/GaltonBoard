@@ -1,0 +1,5 @@
+project_root: ${project_root:}
+data_dir: ${paths.project_root}/data
+raw_data_dir: ${paths.data_dir}/raw
+processed_data_dir: ${paths.data_dir}/processed
+dataset_dir: ${paths.processed_data_dir}/obs_probs_levels${circuit.levels}_shots${circuit.num_shots}_sims${circuit.n_sims}.npz

@@ -1,8 +1,6 @@
 import pennylane as qml
 from pennylane import numpy as np
-from math import asin, sqrt
 
-from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
 from qiskit.providers.fake_provider import GenericBackendV2
 
