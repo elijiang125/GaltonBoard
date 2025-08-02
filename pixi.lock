@@ -132,9 +132,9 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/80/a5/3a92893e7399a691bad7664d977cb5e7c81cf666c81f89ea76ba2bff483d/pandas-2.3.1-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/ef/af/4fbc8cab944db5d21b7e2a5b8e9211a03a79852b1157e2c102fcc61ac440/pandocfilters-1.5.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/ac/684d71315abc7b1214d59304e23a982472967f6bf4bde5a98f1503f648dc/pbr-6.1.1-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/e8/0c/de1e32c368f16eb03eae5e066d37259aa53c950fd7e0b8d788d2ecf75396/pennylane-0.42.1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/df/f3/bac97eedc0c96ee7801365b6018c53d3710eda9d148773201655579582b1/pennylane-0.42.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/77/15/159043820f208dd81cdd8e026d3391150a6d07407d5f62d66a1871f2307f/pennylane_lightning-0.42.0-cp312-cp312-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/3f/8c/036dac124ba198d88686fabc5ed9098e8484c83aca5402a6e818113f1389/pennylane_qiskit-0.42.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/ba/bc/fbecc42368e9aa41a7c4db55e5f25e8666d123b29f4b57bd3a2f01c7833e/pennylane_qiskit-0.41.0.post0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8c/ce/e7dfc873bdd9828f3b6e5c2bbb74e47a98ec23cc5c74fc4e54462f0d9204/pillow-11.3.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/b7/3f/945ef7ab14dc4f9d7f40288d2df998d1837ee0888ec3659c813487572faa/pip-25.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/32/ae/ec06af4fe3ee72d16973474f122541746196aaa16cea6f66d18b963c6177/prometheus_client-0.22.1-py3-none-any.whl
@@ -150,6 +150,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/0c/e8/4f648c598b17c3d06e8753d7d13d57542b30d56e6c2dedf9c331ae56312e/PyYAML-6.0.2-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/25/0c/4952744fb8a6362029afa3dda15603ab4bbd9ac57d98ea4c0c75bdb88bc2/qiskit-1.2.4-cp38-abi3-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/f0/b3/0780bdd3b5bcce7b5fdc20e3b44b6cae08ce0688d86cb92eb9fcbe9dcf13/qiskit_aer-0.16.0-cp312-cp312-win_amd64.whl
+      - pypi: https://files.pythonhosted.org/packages/a3/86/2f775a9ce2514da2ad2b0a5e52640536cbd6dcc1b5e0f6a48297ede96dcb/qiskit_ibm_provider-0.11.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b8/d9/8782397e68781ada9f5f17bae53802f2fe495bda18222f7a8b0e904b73a3/qiskit_ibm_runtime-0.29.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c1/b1/3baf80dc6d2b7bc27a95a67752d0208e410351e3feb4eb78de5f77454d8d/referencing-0.36.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7c/e4/56027c4a6b4ae70ca9de302488c5ca95ad4a39e190093d6c1a8ace08341b/requests-2.32.4-py3-none-any.whl
@@ -186,6 +187,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f4/24/2a3e3df732393fed8b3ebf2ec078f05546de641fe1b667ee316ec1dcf3b7/webencodings-0.5.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5a/84/44687a29792a70e111c5c477230a72c4b957d88d16141199bf9acb7537a3/websocket_client-1.8.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/7d/71/abf2ebc3bbfa40f391ce1428c7168fb20582d0ff57019b69ea20fa698043/websockets-15.0.1-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/0b/2c/87f3254fd8ffd29e4c02732eee68a83a1d3c346ae39bc6822dcbcb697f2b/wheel-0.45.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ca/51/5447876806d1088a0f8f71e16542bf350918128d0a69437df26047c8e46f/widgetsnbextension-4.0.14-py3-none-any.whl
       - pypi: ./
@@ -799,14 +801,15 @@ packages:
 - pypi: ./
   name: galtonboard
   version: 0.1.0
-  sha256: 91cc09dbceef2496fb14bf3485e63a40e83bc023a552015651e3ac029dad3d34
+  sha256: fbe2f383db0c693ff6721c31978d1b92c9f8f35c6e0e135697aeb65792e362b4
   requires_dist:
   - ipython>=9.4.0
   - jupyter>=1.1.1
   - matplotlib>=3.10.3
   - numpy>=2.3.2
   - pandas>=2.3.1
-  - pennylane==0.42.1
+  - pennylane==0.42.0
+  - pennylane-lightning==0.42.0
   - pennylane-qiskit>=0.41.0.post0
   - pip>=25.1.1
   - scikit-learn>=1.7.1
@@ -1857,10 +1860,10 @@ packages:
   requires_dist:
   - setuptools
   requires_python: '>=2.6'
-- pypi: https://files.pythonhosted.org/packages/e8/0c/de1e32c368f16eb03eae5e066d37259aa53c950fd7e0b8d788d2ecf75396/pennylane-0.42.1-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/df/f3/bac97eedc0c96ee7801365b6018c53d3710eda9d148773201655579582b1/pennylane-0.42.0-py3-none-any.whl
   name: pennylane
-  version: 0.42.1
-  sha256: 5a1d51e42922829c63e6fde60140c39b8703c987eccf0a66e8add0a3d28f4d58
+  version: 0.42.0
+  sha256: fd22c511257eba7199ccc7c4839918acea164b53c9f14a168c36a8c4ce87608b
   requires_dist:
   - scipy
   - networkx
@@ -1890,15 +1893,16 @@ packages:
   - pennylane-lightning-kokkos ; extra == 'kokkos'
   - pennylane-lightning-tensor ; extra == 'tensor'
   requires_python: '>=3.10'
-- pypi: https://files.pythonhosted.org/packages/3f/8c/036dac124ba198d88686fabc5ed9098e8484c83aca5402a6e818113f1389/pennylane_qiskit-0.42.0-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/ba/bc/fbecc42368e9aa41a7c4db55e5f25e8666d123b29f4b57bd3a2f01c7833e/pennylane_qiskit-0.41.0.post0-py3-none-any.whl
   name: pennylane-qiskit
-  version: 0.42.0
-  sha256: 190ae938e5fa7fbe3f7d155c9067d26b99832f33ecb3fdec0865b171a9fe1ac5
+  version: 0.41.0.post0
+  sha256: b51f1d63e835387f9bd6359f843c2526458e69362026a0a5e7c17f96fe766bbe
   requires_dist:
   - qiskit>=0.32,<1.3
   - qiskit-aer<0.16.1
   - qiskit-ibm-runtime<=0.29
-  - pennylane>=0.42
+  - qiskit-ibm-provider
+  - pennylane>=0.38
   - numpy
   - sympy<1.13
   - networkx>=2.2
@@ -2235,6 +2239,30 @@ packages:
   - scipy>=1.0
   - psutil>=5
   requires_python: '>=3.7'
+- pypi: https://files.pythonhosted.org/packages/a3/86/2f775a9ce2514da2ad2b0a5e52640536cbd6dcc1b5e0f6a48297ede96dcb/qiskit_ibm_provider-0.11.0-py3-none-any.whl
+  name: qiskit-ibm-provider
+  version: 0.11.0
+  sha256: 3d84aff2df00d0642a9fcb53cf7f7442e62d65d3bbe13e191bc078b2ee474dc6
+  requires_dist:
+  - qiskit>=0.45.0
+  - requests>=2.19
+  - requests-ntlm>=1.1.0
+  - numpy>=1.13
+  - urllib3>=1.21.1
+  - python-dateutil>=2.8.0
+  - websocket-client>=1.5.1
+  - websockets>=10.0
+  - typing-extensions>=4.3
+  - matplotlib>=2.1 ; extra == 'visualization'
+  - ipywidgets<8.0.0 ; extra == 'visualization'
+  - seaborn>=0.9.0 ; extra == 'visualization'
+  - plotly>=4.4 ; extra == 'visualization'
+  - ipyvuetify>=1.1 ; extra == 'visualization'
+  - pyperclip>=1.7 ; extra == 'visualization'
+  - ipython>=5.0.0 ; extra == 'visualization'
+  - traitlets!=5.0.5 ; extra == 'visualization'
+  - ipyvue>=1.8.5 ; extra == 'visualization'
+  requires_python: '>=3.8'
 - pypi: https://files.pythonhosted.org/packages/b8/d9/8782397e68781ada9f5f17bae53802f2fe495bda18222f7a8b0e904b73a3/qiskit_ibm_runtime-0.29.0-py3-none-any.whl
   name: qiskit-ibm-runtime
   version: 0.29.0
@@ -2859,6 +2887,11 @@ packages:
   - wsaccel ; extra == 'optional'
   - websockets ; extra == 'test'
   requires_python: '>=3.8'
+- pypi: https://files.pythonhosted.org/packages/7d/71/abf2ebc3bbfa40f391ce1428c7168fb20582d0ff57019b69ea20fa698043/websockets-15.0.1-cp312-cp312-win_amd64.whl
+  name: websockets
+  version: 15.0.1
+  sha256: fcd5cf9e305d7b8338754470cf69cf81f420459dbae8a3b40cee57417f4614a7
+  requires_python: '>=3.9'
 - pypi: https://files.pythonhosted.org/packages/0b/2c/87f3254fd8ffd29e4c02732eee68a83a1d3c346ae39bc6822dcbcb697f2b/wheel-0.45.1-py3-none-any.whl
   name: wheel
   version: 0.45.1

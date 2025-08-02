@@ -139,7 +139,7 @@ def galton_template(levels: int, bias, *, coherence=False):
             side = lvl - 1
             level_ws = [q0] + list(range(mid - side, mid + side + 1))
             need = lvl - 2
-            level_pegs(level_ws, phis[phi_ptr : phi_ptr + need], coherence)
+            level_pegs(level_ws, phis[phi_ptr : phi_ptr + need])
             phi_ptr += need
 
             if lvl < levels and not coherence:

@@ -3,7 +3,8 @@ jupyter>=1.1.1
 matplotlib>=3.10.3
 numpy>=2.3.2
 pandas>=2.3.1
-pennylane==0.42.1
+pennylane==0.42.0
+pennylane-lightning==0.42.0
 pennylane-qiskit>=0.41.0.post0
 pip>=25.1.1
 scikit-learn>=1.7.1
