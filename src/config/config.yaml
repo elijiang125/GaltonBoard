@@ -7,5 +7,6 @@ defaults:
   - loss_fn: cross_entropy
   - optimizer: adam
   - train: default
+  - distribution: normal
 
-run_mode: train # Options are generate, train, test, and sample_dist
+run_mode: train # Options are generate, train, and sample_dist

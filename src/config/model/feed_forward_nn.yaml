@@ -1,4 +1,4 @@
 _target_: models.neural_nets.FeedForwardNN
-name: FeedForwardNN
-hidden_size: False # Change to a number
-hidden_layers: 1
+input_size: ${num_states:${circuit.levels}}
+output_size: ${Rx_n:${circuit.levels}}
+hidden_size: ${mean:${num_states:${circuit.levels}}, ${Rx_n:${circuit.levels}}}

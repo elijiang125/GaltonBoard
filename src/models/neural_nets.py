@@ -19,6 +19,6 @@ class FeedForwardNN(nn.Module):
 
     def forward(self, x):
         # Define forward pass
-        out = layer_stack(x)
+        out = self.layer_stack(x)
 
         return out
