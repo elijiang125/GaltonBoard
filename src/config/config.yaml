@@ -1,0 +1,12 @@
+defaults:
+  - _self_
+  - paths: paths
+  - circuit: ideal
+  - dataset: default
+  - model: feed_forward_nn
+  - loss_fn: cross_entropy
+  - optimizer: adam
+  - train: default
+  - distribution: normal
+
+run_mode: train # Options are generate, train, and sample_dist

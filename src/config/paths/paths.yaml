@@ -1,0 +1,15 @@
+# Basenames to distinguish outputs of this run
+circuit_run_basename: ${circuit.name}_obs_probs_levels${circuit.levels}_shots${circuit.num_shots}_sims${circuit.n_sims}
+dataset_run_basename: train${dataset.train_size}_val${dataset.val_size}_test${dataset.test_size}
+
+# Data directories
+project_root: ${project_root:}
+data_dir: ${paths.project_root}/data
+raw_data_dir: ${paths.data_dir}/raw
+raw_data_basename: ${paths.raw_data_dir}/${paths.circuit_run_basename}
+processed_data_dir: ${paths.data_dir}/processed/${paths.circuit_run_basename}/${paths.dataset_run_basename}
+
+# Outputs directories
+outputs_dir: ${paths.project_root}/outputs/${paths.circuit_run_basename}
+models_dir: ${paths.outputs_dir}/models
+plots_dir: ${paths.outputs_dir}/plots

@@ -1,0 +1,4 @@
+_target_: models.neural_nets.FeedForwardNN
+input_size: ${num_states:${circuit.levels}}
+output_size: ${Rx_n:${circuit.levels}}
+hidden_size: ${mean:${num_states:${circuit.levels}}, ${Rx_n:${circuit.levels}}}

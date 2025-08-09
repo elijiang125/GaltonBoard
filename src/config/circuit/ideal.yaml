@@ -1,0 +1,4 @@
+name: ideal
+levels: 10
+num_shots: 1000
+n_sims: 1000

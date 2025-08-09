@@ -1,0 +1,4 @@
+name: noisy
+levels: 5
+num_shots: 1000
+n_sims: 1000

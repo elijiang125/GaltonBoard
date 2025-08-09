@@ -1,0 +1,5 @@
+_target_: data.dist_sample.sample_expon
+lambda_val: 1
+n: 10000
+bins: ${circuit.levels}
+seed: 1925

@@ -1,0 +1,6 @@
+_target_: data.dist_sample.sample_norm
+mu: 0
+sigma: 1
+n: 10000
+bins: ${circuit.levels}
+seed: 1925
