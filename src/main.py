@@ -45,7 +45,6 @@ def main(cfg: DictConfig):
 
     # Train and test a neural network to predict the circuit's parameters
     elif cfg.run_mode == "train":
-        # TODO: check if needed files from config exist
 
         # Instantiate the model, loss function and optimizer
         model_inst = instantiate(cfg.model)
@@ -68,7 +67,6 @@ def main(cfg: DictConfig):
                                           train_outdir=models_dir)
 
         # Test the model. Predictions are saved
-        # TODO: test if model instance is affected by train or if a copy is created
         preds_path = test(model=model_inst, 
                           criterion=loss_fn_inst, 
                           weights_path=weights_path, 
@@ -89,19 +87,16 @@ def main(cfg: DictConfig):
     
     # Use a trained model to predict the biases for a given distribution
     elif cfg.run_mode == "sample_dist":
-        # TODO: check if needed files from config exist
         
         # Load the model with it's weights
         model = instantiate(cfg.model)
         models_dir = Path(cfg.paths.models_dir)
         
-        # TODO: make a new resolver to specify these paths since they're being used by multiple functions
         # Weights file path is reconstructed the same way it was created, 
         weights_path = models_dir.joinpath(f"{model.__class__.__name__}_weights.pt")
         model_weights = torch.load(weights_path, weights_only=True)
         model.load_state_dict(model_weights)
 
-        # TODO: make a new resolver to specify this path as well
         # Load scaler used for the training data
         dataset_dir = Path(cfg.paths.processed_data_dir)
         scaler_path = dataset_dir.joinpath("scaler.joblib")

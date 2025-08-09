@@ -10,7 +10,6 @@ from torch.utils.data import DataLoader
 from data.data_classes import CircuitDataset
 
 
-# TODO: Implement early stopping
 def train(model, 
           criterion, 
           optimizer, 
@@ -25,7 +24,6 @@ def train(model,
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    # TODO: find a better way to choose this number
     num_workers = 2
 
     # Datasets

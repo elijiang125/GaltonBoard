@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.stats import norm, expon
 
-# TODO: If we want to make this cleaner, we could define a class that samples given some
 # parameters and the scipy probability function, and has discretize as a method.
 
 def discretize(data: np.ndarray, bins: int):

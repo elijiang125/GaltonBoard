@@ -76,7 +76,6 @@ def dataset_split(dataset_path: Path, outputs_path: Path, train_size: float, tes
         print("Error: train, validation and size don't add up to 1")
         return
 
-    # TODO: check that the array is the same as the matrix
     # Load the dataset
     data_mat = sp.sparse.load_npz(dataset_path).toarray()
 
