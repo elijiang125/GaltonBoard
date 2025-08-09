@@ -8,7 +8,7 @@ from .gates import reset_gate, quantum_peg
 from utils.misc import triangular_number, angle_from_prob, count_mcm
 
 
-def level_pegs(qubits: list, phi_vals: list) -> None:
+def level_pegs(qubits: list, phi_vals: list, coherence: bool) -> None:
     """
     Applies all the quantum peg modules for a single level.
     Does this by taking triplets starting from the leftmost and moving to the right.
@@ -29,13 +29,15 @@ def level_pegs(qubits: list, phi_vals: list) -> None:
 
         # Return control qubit to original rotation
         if tri_idx + 1 < len(qubits_triplets):  # +1 is there because indices start at 0
-            reset_gate(0)  # Reset control qubit
+            enable_reset = not coherence
+            reset_gate(0, enable=enable_reset)  # Reset control qubit
             qml.RX(phi_vals[tri_idx], wires=[q0])
 
 
 def build_galton_circuit(levels: int, 
                          num_shots: int, 
                          bias: int | float | list = 0.5,
+                         coherence: bool = False,
                          add_noise: bool = False):
     """
     Creates the quantum circuit for a Fine-Grained Biased Quantum Galton Board.
@@ -126,7 +128,8 @@ def build_galton_circuit(levels: int,
             
             # Reset the control qubit to |0> and apply Rx if there is a next level
             if lvl < levels:
-                reset_gate(0)  # Reset control qubit
+                enable_reset = not coherence
+                reset_gate(0, enable=enable_reset)  # Reset control qubit
                 qml.RX(phi_vals[Rx_used + Rx_needed], wires=[q0])
        
         # Return observed values
