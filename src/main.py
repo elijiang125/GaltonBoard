@@ -45,9 +45,10 @@ def main(cfg: DictConfig):
 
     # Train and test a neural network to predict the circuit's parameters
     elif cfg.run_mode == "train":
-
+        # Use CUDA if available
+        device = "cpu"
         # Instantiate the model, loss function and optimizer
-        model_inst = instantiate(cfg.model)
+        model_inst = instantiate(cfg.model).to(device)  # Needs to go to device before creating optimizer
         loss_fn_inst = instantiate(cfg.loss_fn)
         optimizer_inst = instantiate(cfg.optimizer, params=model_inst.parameters())
 
@@ -87,9 +88,10 @@ def main(cfg: DictConfig):
     
     # Use a trained model to predict the biases for a given distribution
     elif cfg.run_mode == "sample_dist":
-        
+        # Use CUDA if available
+        device = "cpu"        
         # Load the model with it's weights
-        model = instantiate(cfg.model)
+        model = instantiate(cfg.model).to(device)  # Move before creating optimizer
         models_dir = Path(cfg.paths.models_dir)
         
         # Weights file path is reconstructed the same way it was created, 

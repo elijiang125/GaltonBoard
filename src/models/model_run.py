@@ -21,7 +21,7 @@ def train(model,
     Run the training
     """
     # Use CUDA if available
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     model.to(device)
 
     num_workers = 2
@@ -115,7 +115,7 @@ def test(model, criterion, weights_path: Path, data_dir: Path, test_outdir: Path
     Test the model
     """
     # Use CUDA if available
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     model.to(device)
     
     num_workers = 2
@@ -167,7 +167,7 @@ def dist_eval(model, target_dist: FloatTensor, scaler_path: Path) -> list:
     """
     """
     # Use CUDA if available
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     model.to(device)
 
     # Scale the target distribution samples as we did for the training data
