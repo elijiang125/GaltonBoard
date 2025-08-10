@@ -8,7 +8,7 @@ import sys
 sys.path.append("src")
 
 from circuit.quantum_galton_board import build_galton_circuit
-# ---------------------------- Helpers ----------------------------
+# Some helper functions
 
 def angle_to_bias(theta):
     return np.cos(theta / 2) ** 2
@@ -77,7 +77,7 @@ def kl_divergence(p, q):
     q = np.clip(q, 1e-8, 1)
     return entropy(p, q)
 
-# ---------------------------- Cost Functions ----------------------------
+# Cost Function
 
 def variational_cost_fn(angles, levels, target_kind, dev=None):
     biases = angle_to_bias(np.array(angles))
@@ -86,7 +86,7 @@ def variational_cost_fn(angles, levels, target_kind, dev=None):
     target = target_distribution(target_kind, len(probs))
     return kl_divergence(probs, target)
 
-# ---------------------------- Optimization ----------------------------
+# Optimize
 
 def optimize_qaoa_params(levels, target_kind, dev=None, maxiter=200):
     from utils.misc import triangular_number
@@ -107,7 +107,7 @@ def optimize_qaoa_params(levels, target_kind, dev=None, maxiter=200):
     final_probs = circuit()
     return final_probs, final_angles
 
-# ---------------------------- Main Execution ----------------------------
+# Main
 
 def run_qaoa(levels, target_kind, layers=1, dev=None, maxiter=200, coherence=False, verbose=False):
     """
