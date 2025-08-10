@@ -90,6 +90,7 @@ def main(cfg: DictConfig):
     elif cfg.run_mode == "sample_dist":
         # Use CUDA if available
         device = "cpu"        
+
         # Load the model with it's weights
         model = instantiate(cfg.model).to(device)  # Move before creating optimizer
         models_dir = Path(cfg.paths.models_dir)
@@ -104,7 +105,10 @@ def main(cfg: DictConfig):
         scaler_path = dataset_dir.joinpath("scaler.joblib")
 
         # Sample from the target probability distribution
-        target_dist = instantiate(cfg.distribution)
+        dist_config = cfg.distribution.copy()
+        dist_name = dist_config.name
+        del dist_config.name
+        target_dist = instantiate(dist_config)
 
         # Add positions for mixed states to simulate the circuit's output
         target_dist = torch.tensor(add_mixed_states(target_dist), dtype=torch.float32)
@@ -130,14 +134,14 @@ def main(cfg: DictConfig):
         plot_histogram(dist_vals=target_dist.numpy(), 
                        mixed_states=noise, 
                        outfile=target_dist_plotfile, 
-                       plot_title="Target distribution")
+                       plot_title=f"Target {dist_name} distribution")
 
         # Plot the resulting distribution from the circuit
         circuit_dist_plotfile = plots_dir.joinpath("circuit_dist.png")
         plot_histogram(dist_vals=circuit_dist, 
                        mixed_states=noise, 
                        outfile=circuit_dist_plotfile,
-                       plot_title="Circuit's output distribution")
+                       plot_title=f"Circuit's output {dist_name} distribution")
 
 
 if __name__ == "__main__":

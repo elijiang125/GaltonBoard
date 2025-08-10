@@ -1,4 +1,5 @@
 _target_: data.dist_sample.sample_norm
+name: normal
 mu: 0
 sigma: 1
 n: 10000

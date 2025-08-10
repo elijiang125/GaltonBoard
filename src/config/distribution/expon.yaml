@@ -1,4 +1,5 @@
 _target_: data.dist_sample.sample_expon
+name: exponential
 lambda_val: 1
 n: 10000
 bins: ${circuit.levels}
