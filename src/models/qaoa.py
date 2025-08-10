@@ -98,7 +98,7 @@ def _expval_bitstring_with_cut(
     @qml.qnode(dev)
     def qnode():
         # <<< THIS is the critical change: use the template so ops are queued >>>
-        galton = galton_template(levels=levels, bias=bias, coherence=coherence)
+        galton = build_galton_circuit(levels=levels, bias=bias, coherence=coherence)
         galton()                             # queues the Galton ops on this tape
 
         # place WireCut markers
