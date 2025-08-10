@@ -101,7 +101,7 @@ def build_galton_circuit(levels: int,
             Rx_needed = lvl - 2  # Number of Rx gates needed within the current level (# of spaces between pegs)
             Rx_used = triangular_number(Rx_needed) + 1  # Number of Rx gates used so far
             level_phi_vals = phi_vals[Rx_used:Rx_used + Rx_needed]
-            level_pegs(level_qubits, level_phi_vals)
+            level_pegs(level_qubits, level_phi_vals, coherence)
 
             # Add leftover rotation for the final triplet and reset
             if lvl >= 3:
