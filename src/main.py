@@ -118,6 +118,8 @@ def main(cfg: DictConfig):
                                 target_dist=target_dist, 
                                 scaler_path=scaler_path)
 
+        print(pred_biases)
+
         # Build a circuit with the predicted biases
         noise = True if cfg.circuit.name == "noisy" else False
         galton_circuit = qgb.build_galton_circuit(levels=int(cfg.circuit.levels), 

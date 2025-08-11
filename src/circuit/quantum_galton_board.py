@@ -104,7 +104,7 @@ def build_galton_circuit(levels: int,
             level_pegs(level_qubits, level_phi_vals, coherence)
 
             # Add leftover rotation for the final triplet and reset
-            if lvl >= 3:
+            if lvl >= 3 and not coherence:
                 # Draw a barrier for visualization
                 qml.Barrier()
 

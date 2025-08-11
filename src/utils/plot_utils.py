@@ -56,7 +56,7 @@ def plot_histogram(dist_vals: np.ndarray, mixed_states: bool, plot_title: str, o
         obs_dict = {format(idx, f"0{num_qubits}b"): value for idx, value in enumerate(dist_vals)}
 
     else:
-        obs_dict = {format(2**idx, f"0{num_qubits}b"): dist_vals[idx] for idx in range(num_qubits)}
+        obs_dict = {format(2**idx, f"0{num_qubits}b"): dist_vals[2**idx] for idx in range(num_qubits)}
 
     x_pos = list(range(len(obs_dict)))
 
